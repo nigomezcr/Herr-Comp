@@ -1,1 +1,1 @@
-Este es un archivo de ayuda
+Este es el primer cambio del archivo de ayuda
