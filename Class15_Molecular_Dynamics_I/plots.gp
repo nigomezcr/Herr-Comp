@@ -19,3 +19,7 @@ set out "z-x.pdf"
 set xlabel "x"
 set ylabel "z"
 p 'data.txt' u 2:4 t "z vs x" w l lt 5
+set out "E-t.pdf"
+set xlabel "t"
+set ylabel "E"
+p 'data.txt' u 1:8 t "E vs t" w l lt 6

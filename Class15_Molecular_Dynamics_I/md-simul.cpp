@@ -1,5 +1,4 @@
 #include "md-simul.h"
-//#include "md-simul.h"
 
 void initial_conditions(Particle & body)
 {
@@ -7,7 +6,7 @@ void initial_conditions(Particle & body)
   body.Rz = 0.5;
   body.Vx = 0.3972;
   body.Vy = -0.8018;
-  body.Vz = -0.2513;
+  body.Vz = 0.2513;
 
   body.rad = 0.235;
   body.mass = 0.29698;
@@ -15,8 +14,12 @@ void initial_conditions(Particle & body)
 
 void compute_force(Particle & body)
 {
-  // reset force
+  //Compute Energy
+  body.E = body.Ep + body.Ek;
+  
+  // reset force and potential energy
   body.Fx = body.Fy = body.Fz = 0.0;
+  body.Ep = 0.0;
 
   // gravitational force
   //body.Fy += body.mass*G;
@@ -25,7 +28,7 @@ void compute_force(Particle & body)
   double delta = body.rad - body.Ry;
   if (delta > 0) {
     body.Fy += K*delta;
-    //body.Fy -= 1.9876*body.Vy;
+    body.Ep += (K*delta*delta)/2;
   }
 
   //Roof
@@ -34,12 +37,14 @@ void compute_force(Particle & body)
 
   if (delta > 0) {
   body.Fy -= K*delta;
+  body.Ep += (K*delta*delta)/2;
   }
 
   //Left wall
   delta = body.rad - body.Rx;
   if (delta > 0) {
   body.Fx = K*delta;
+  body.Ep += (K*delta*delta)/2;
   }
 
   //Right wall
@@ -48,12 +53,14 @@ void compute_force(Particle & body)
 
   if (delta > 0) {
   body.Fx -= K*delta;
+  body.Ep += (K*delta*delta)/2;
   }
 
   //back wall
   delta = body.rad - body.Rz;
   if (delta > 0) {
   body.Fz += K*delta;
+  body.Ep += (K*delta*delta)/2;
   }
 
   //front wall
@@ -62,10 +69,9 @@ void compute_force(Particle & body)
 
   if (delta > 0) {
   body.Fz -= K*delta;
+  body.Ep += (K*delta*delta)/2;
   }
-
 }
-
 
 
 void start_integration(Particle & body, const double & dt)
@@ -86,6 +92,14 @@ void start_integration(Particle & body, const double & dt)
   body.Rz += body.Vz*dt;
 }
 
+  void Ek_in_phase(Particle & body, const double & dt)
+{
+  double Vx = body.Vx - body.Fx*dt/(2*body.mass);
+  double Vy = body.Vy - body.Fy*dt/(2*body.mass);
+  double Vz = body.Vz - body.Fz*dt/(2*body.mass);
+  body.Ek = body.mass*(Vx*Vx + Vy*Vy + Vz*Vz)/2;
+}
+
 void print(Particle & body, double time)
 {
   std::cout << time << "  "
@@ -95,5 +109,6 @@ void print(Particle & body, double time)
             << body.Vx << "  "
             << body.Vy << "  "
             << body.Vz << "  "
+            << body.E << "  "
             << "\n";
 }

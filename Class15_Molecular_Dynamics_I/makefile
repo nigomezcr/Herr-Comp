@@ -1,8 +1,8 @@
-all: pdfs
-
 CXX=g++
 OBJECTS=main-md.o md-simul.o
 CXXFLAGS=-O2 -g -std=c++14
+
+all: pdfs
 
 main-md.x: $(OBJECTS) particle.h
 	$(CXX) $(CXXFLAGS) $(OBJECTS) -o $@
@@ -19,5 +19,5 @@ pdfs: data.txt plots.gp
 
 
 clean:
-	rm -f *.o *.x *.txt
+	rm -f *.o *.x *.txt *.pdf
 

@@ -15,5 +15,6 @@ void compute_force(Particle & body);
 void time_integration(Particle & body, const double & dt);
 void start_integration(Particle & body, const double & dt);
 void print(Particle & body, double time);
+void Ek_in_phase(Particle & body, const double & dt);
 
 #endif // __MD_SIMUL_H_
