@@ -2,9 +2,11 @@
 #include <cmath>
 #include <functional>
 #include <omp.h>
+#include <chrono>
 
 using fptr  = double(double);
 
+void print_elapsed(auto start, auto end);
 double f(double x);
 double simpson(fptr fun, double a, double b, int nthreads);
 
@@ -15,11 +17,14 @@ const double xmax = 10.0;
 int main(int argc, char **argv)
 {
     const int NTH = std::atoi(argv[1]);
-    std::cout.precision(15); std::cout.setf(std::ios::scientific);
+    std::cout.precision(6); std::cout.setf(std::ios::scientific);
 
+    auto start  = std::chrono::steady_clock::now();
     double integral  = simpson(f, xmin, xmax, NTH);
+    auto end  = std::chrono::steady_clock::now();
+    print_elapsed(start, end);
 
-    std::cout << integral << '\n';
+    //std::cout << integral << '\n';
 
     return 0;
 }
@@ -57,4 +62,9 @@ double simpson(fptr fun, double a, double b, int nthreads)
       suma = h*(fun(a) + 2*aux1 + 4*aux2 + fun(b))/3;
     }
     return suma;
+}
+
+void print_elapsed(auto start, auto end)
+{
+  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()/1000.0 << "\n";
 }
