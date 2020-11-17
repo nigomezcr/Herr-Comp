@@ -1,6 +1,6 @@
 #!/bin/bash 
     echo "Starting integration"
-    for NTH in 1 2 3 4 5 6 7 8 16 32; do
+    for NTH in 1 2 3 4 5 6 7 8; do
 	echo -n "$NTH  ";
 	./a.out  $NTH;
     done > scaling-int.txt | head -n 1
