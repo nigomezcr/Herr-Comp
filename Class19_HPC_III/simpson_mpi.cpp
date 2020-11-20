@@ -2,23 +2,22 @@
 #include <cmath>
 #include <functional>
 #include <mpi.h>
-#include <chrono>
+
 
 using fptr  = double(double);
 
-void print_elapsed(auto start, auto end);
 void suma(double *data, int NSlocal, int pid, int nproc, double vl);
 double f(double x);
 double simpson(fptr fun, double a, double b, int N);
 
-const int N = 6000000;
+const int N = 8000000;
 const double xmin = 0.0;
 const double xmax = 100.0;
 
 int main(int argc, char **argv)
 {
 
-  std::cout.precision(15); std::cout.setf(std::ios::scientific);
+  std::cout.precision(5); std::cout.setf(std::ios::scientific);
     
     MPI_Init(&argc, &argv);
     int pid = 0, nthreads = 0;
@@ -29,17 +28,24 @@ int main(int argc, char **argv)
     double NSlocal = xmax/nthreads;
     double valorlocal = 0, *data = 0;
     
-    auto start  = std::chrono::steady_clock::now();
+    double start = MPI_Wtime();
     valorlocal = simpson(f,NSlocal*pid,NSlocal*(pid+1),N/nthreads);
-    data = &valorlocal;
-    auto end  = std::chrono::steady_clock::now();
-    
-    std::cout << "pid: " << pid << "\n"
-	      << "valorlocal: " << *data << "\n" << "tiempo:\t";
-    print_elapsed(start, end);
-    std::cout << "\n\n";
-    suma(data, NSlocal, pid, nthreads, valorlocal);
 
+    
+    
+    data = &valorlocal;
+    /* 
+    std::cout << "pid: " << pid << "\n"
+	      << "valorlocal: " << *data << "\n";
+    
+    std::cout << "\n\n";
+    */
+
+    suma(data, NSlocal, pid, nthreads, valorlocal);
+    double end = MPI_Wtime();
+    if (pid==0){
+    std::cout  << end- start << "\n";
+    }
     MPI_Finalize();
     
     return 0;
@@ -71,11 +77,6 @@ double simpson(fptr fun, double a, double b, int N)
     return suma;
 }
 
-void print_elapsed(auto start, auto end)
-{
-  std::cout << std::chrono::duration_cast<std::chrono::milliseconds>(end-start).count()/1000.0 << "\n";
-}
-
 
 void suma(double *data, int NSlocal, int pid, int nproc, double vl)
 {
@@ -88,7 +89,7 @@ void suma(double *data, int NSlocal, int pid, int nproc, double vl)
       MPI_Recv(&aux, 1, MPI_DOUBLE, src, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       sum += aux;
     }
-    std::cout << "valor de la integral:\t" << sum << '\n';
+    //  std::cout << "valor de la integral con " << nproc << " procesos: "  << sum << '\n';
   } else {
     int dest = 0;
     MPI_Send(data, 1, MPI_DOUBLE, dest, tag, MPI_COMM_WORLD);
