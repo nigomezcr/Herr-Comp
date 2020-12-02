@@ -44,7 +44,7 @@ int main(int argc, char **argv)
     suma(data, NSlocal, pid, nthreads, valorlocal);
     double end = MPI_Wtime();
     if (pid==0){
-    std::cout  << end- start << "\n";
+      //        std::cout  << end- start << "\n";
     }
     MPI_Finalize();
     
@@ -89,7 +89,7 @@ void suma(double *data, int NSlocal, int pid, int nproc, double vl)
       MPI_Recv(&aux, 1, MPI_DOUBLE, src, tag, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
       sum += aux;
     }
-    //  std::cout << "valor de la integral con " << nproc << " procesos: "  << sum << '\n';
+    std::cout << "valor de la integral con " << nproc << " procesos: "  << sum << '\n';
   } else {
     int dest = 0;
     MPI_Send(data, 1, MPI_DOUBLE, dest, tag, MPI_COMM_WORLD);
